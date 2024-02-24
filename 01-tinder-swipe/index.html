@@ -1,0 +1,161 @@
+<title>100 Proyectos JS - 01 - Tinder- Swipe</title>
+
+<main>
+  <section>
+    <header>
+      <img src="./tinder-logo.webp" alt="Tinder logo" />
+    </header>
+
+    <div class="cards">
+      <article>
+        <img src="./photos/1.webp" alt="Beatiful girl" />
+        <h2>Valeria <span>25</span></h2>
+
+        <div class="choise nope">NOOPE</div>
+        <div class="choise like">LIKE</div>
+      </article>
+
+      <article>
+        <img src="./photos/2.webp" alt="Alex de 25 años" />
+        <h2>Alex <span>25</span></h2>
+
+        <div class="choise nope">NOOPE</div>
+        <div class="choise like">LIKE</div>
+      </article>
+    </div>
+
+    <footer>
+      <button class="is-refresh" aria-label="undo"></button>
+      <button class="is-remove is-big" aria-label="remove"></button>
+      <button class="is-star" aria-label="star"></button>
+      <button class="is-fav is-big" aria-label="fav"></button>
+      <button class="is-zap" aria-label="zap"></button>
+    </footer>
+  </section>
+</main>
+
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+      sans-serif;
+    display: grid;
+    place-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    background: #e7e7e7;
+  }
+
+  main {
+    background: url('./iphone.webp') no-repeat;
+    background-size: contain;
+    width: 320px;
+    height: 640px;
+    display: flex;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
+  }
+
+  section {
+    background: #fffefe;
+    width: 100%;
+    border-radius: 32px;
+    display: flex;
+    gap: 24px;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    padding: 16px 6px;
+    margin: 24px;
+  }
+
+  header {
+    display: flex;
+    justify-content: center;
+
+    & img {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  footer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    padding: 0 24px;
+    justify-content: center;
+    align-items: center;
+
+    & button {
+      background: url('./tinder-icons.webp') no-repeat;
+      background-position: 0px 0px;
+      background-size: 150px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .cards {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+
+    & article {
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      cursor: grab;
+      overflow: hidden;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      & h2 {
+        color: #fffefe;
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        height: 100%;
+        width: 100%;
+        padding: 16px;
+        z-index: 3;
+        background: linear-gradient(to top, #00000088 20%, transparent 40%);
+      }
+
+      & span {
+        font-size: 18px;
+        margin-left: 6px;
+        line-height: 1.4;
+        font-weight: 400;
+      }
+    }
+  }
+</style>
