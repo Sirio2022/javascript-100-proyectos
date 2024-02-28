@@ -289,7 +289,7 @@
       actualCard.style.cursor = 'grabbing';
 
       // Show the decision buttons
-      const opacity = Math.abs(pullDeltaX) / 150;
+      const opacity = Math.abs(pullDeltaX) / 100;
       const isRight = pullDeltaX > 0;
 
       const choiseElement = isRight
@@ -334,6 +334,11 @@
         pullDeltaX = 0;
         isAnimating = false;
       });
+
+      // reset the choise info opacity
+      actualCard
+        .querySelectorAll('.choise')
+        .forEach((choise) => (choise.style.opacity = 0));
     }
   }
 
