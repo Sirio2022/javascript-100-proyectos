@@ -19,13 +19,18 @@
         <img src="./photos/2.webp" alt="Alex de 25 años" />
         <h2>Alex <span>25</span></h2>
 
-        <div class="choise nope">NOOPE</div>
+        <div class="choise nope">NOPE</div>
         <div class="choise like">LIKE</div>
       </article>
+
+      <span>
+        No hay más personas cerca de ti <br />
+        Vuelve a intentarlo más tarde
+      </span>
     </div>
 
     <footer>
-      <button class="is-refresh" aria-label="undo"></button>
+      <button class="is-undo" aria-label="undo"></button>
       <button class="is-remove is-big" aria-label="remove"></button>
       <button class="is-star" aria-label="star"></button>
       <button class="is-fav is-big" aria-label="fav"></button>
@@ -110,6 +115,32 @@
       &:hover {
         transform: scale(1.1);
       }
+
+      &.is-big {
+        background-size: 270px;
+        width: 48px;
+        height: 48px;
+      }
+
+      &.is-undo {
+        background-position: -179px 0px;
+      }
+
+      &.is-remove {
+        background-position: -165px 0px;
+      }
+
+      &.is-star {
+        background-position: -90px 0px;
+      }
+
+      &.is-fav {
+        background-position: -55px 0px;
+      }
+
+      &.is-zap {
+        background-position: -0px 0px;
+      }
     }
   }
 
@@ -118,6 +149,16 @@
     width: 100%;
     height: 100%;
     margin: 0 auto;
+
+    & > span {
+      display: grid;
+      place-content: center;
+      font-size: 18px;
+      color: #00000088;
+      text-align: center;
+      padding: 24px;
+      z-index: -1;
+    }
 
     & article {
       border-radius: 8px;
@@ -129,6 +170,52 @@
       width: 100%;
       height: 100%;
       z-index: 2;
+
+      &.go-left {
+        transform: translateX(-150%) rotate(-30deg) !important;
+      }
+      &.go-right {
+        transform: translateX(150%) rotate(30deg) !important;
+      }
+
+      &.go-left,
+      &.go-right {
+        transition: transform 0.3s ease, rotate 0.3s ease;
+      }
+
+      &.reset {
+        transition: transform 0.3s ease;
+        transform: translateX(0) !important;
+      }
+
+      & .choise {
+        color: #fffefe;
+        font-size: 24px;
+        font-weight: 900;
+        position: absolute;
+        top: 24px;
+        padding: 8px 16px;
+        border: 4px solid;
+        border-radius: 8px;
+        z-index: 99999;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        width: fit-content;
+        opacity: 0;
+
+        &.nope {
+          color: #ff4d4d;
+          border-color: #ff4d4d;
+          right: 16px;
+          transform: rotate(30deg);
+        }
+
+        &.like {
+          color: #05ef05;
+          border-color: #05ef05;
+          left: 16px;
+          transform: rotate(-30deg);
+        }
+      }
 
       & img {
         width: 100%;
@@ -158,3 +245,98 @@
     }
   }
 </style>
+
+<script>
+  const DECISION_THRESHOLD = 150; // Minimum distance to remove the card
+  let isAnimating = false;
+  let pullDeltaX = 0; // Distance from the initial point
+
+  function startDragging(e) {
+    if (isAnimating) return;
+
+    // get the first article element
+    const actualCard = e.target.closest('article');
+
+    // get the initial position of the mouse or touch
+    const initialX = e.pageX ?? e.touches[0].pageX;
+
+    // listen to the mousemove or touchmove event
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+
+    document.addEventListener('touchmove', onMove), { passive: true };
+    document.addEventListener('touchend', onEnd), { passive: true };
+
+    function onMove(e) {
+      // current position of the mouse or touch
+      const currentX = e.pageX ?? e.touches[0].pageX;
+
+      // distance from the initial point
+      pullDeltaX = currentX - initialX;
+
+      // No animation if the distance is less than 0
+      if (pullDeltaX === 0) return;
+
+      // The card is being animated
+      isAnimating = true;
+      // Calculate the rotation angle based on the distance
+      const rotation = pullDeltaX / 14;
+
+      // Apply the rotation to the card
+      actualCard.style.transform = `translateX(${pullDeltaX}px) rotate(${rotation}deg)`;
+
+      // Change the cursor to grabbing
+      actualCard.style.cursor = 'grabbing';
+
+      // Show the decision buttons
+      const opacity = Math.abs(pullDeltaX) / 150;
+      const isRight = pullDeltaX > 0;
+
+      const choiseElement = isRight
+        ? actualCard.querySelector('.choise.like')
+        : actualCard.querySelector('.choise.nope');
+
+      choiseElement.style.opacity = opacity;
+    }
+
+    function onEnd(e) {
+      // Remove the event listeners
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+
+      // TODO: Add the logic to remove the card
+      const decisionMade = Math.abs(pullDeltaX) >= DECISION_THRESHOLD;
+      if (decisionMade) {
+        const goRight = pullDeltaX >= 0;
+        const goLeft = !goRight;
+
+        // Add the class to animate the card according to the decision
+        actualCard.classList.add(goRight ? 'go-right' : 'go-left');
+
+        actualCard.addEventListener('transitionend', () => {
+          // Remove the card from the DOM
+          actualCard.remove();
+        });
+      } else {
+        // Add the class to reset the card position
+        actualCard.classList.add('reset');
+        actualCard.classList.remove('go-right', 'go-left');
+      }
+      actualCard.addEventListener('transitionend', () => {
+        // Reset the card position
+
+        actualCard.removeAttribute('style');
+        actualCard.classList.remove('reset');
+
+        pullDeltaX = 0;
+        isAnimating = false;
+      });
+    }
+  }
+
+  document.addEventListener('mousedown', startDragging);
+  document.addEventListener('touchstart', startDragging), { passive: true };
+</script>
