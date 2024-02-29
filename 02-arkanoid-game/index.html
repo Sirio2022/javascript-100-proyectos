@@ -8,7 +8,8 @@
   canvas {
     border: 4px solid #fff;
     border-bottom: transparent;
-    background: #000;
+    background: url('/bg.png') repeat; /* Background image */
+
     display: block;
     margin: 0 auto;
   }
@@ -16,52 +17,143 @@
 
 <canvas></canvas>
 
+<img
+  hidden
+  id="sprites-arkanoid"
+  src="/arkanoid-sprite.png"
+  alt="Sprites Arkanoid"
+/>
+
 <script>
   const canvas = document.querySelector('canvas');
   const ctx = canvas.getContext('2d'); // 2d rendering context. It's like a paintbrush. We can use 'webgl', 'bitmaprenderer' for 3d rendering.
 
-  canvas.width = 800;
-  canvas.height = 600;
+  const $sprites = document.getElementById('sprites-arkanoid');
+
+  canvas.width = 722;
+  canvas.height = 501;
 
   // Our game variables
   let counter = 0;
 
-  // Ball variables
+  /* Ball variables */
   const ballRadius = 5;
 
   // Ball position
-  let x = canvas.width / 2;
-  let y = canvas.height - 30;
+  let x = canvas.width / 2; // Center of the canvas
+  let y = canvas.height - 30; // 30px from the bottom
 
   // Ball velocity
-  let dx = 2;
-  let dy = -2;
+  let dx = -3; // Direction x
+  let dy = -3; // Direction y. Negative because we want the ball to go up
+
+  /* Paddle variables */
+  const paddleHeight = 15;
+  const paddleWidth = 60;
+
+  const PADDLE_SPEED = 7;
+
+  let rightPressed = false;
+  let leftPressed = false;
+
+  let paddleX = (canvas.width - paddleWidth) / 2; // Center the paddle
+  let paddleY = canvas.height - paddleHeight - 10; // 10px from the bottom
 
   function drawBall() {
-    ctx.beginPath();
+    ctx.beginPath(); // Start drawing
     ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
     ctx.fill();
-    ctx.closePath();
+    ctx.closePath(); // End drawing
   }
 
-
-
-
-
-
-
-
-
-
-  function drawPaddle() {}
+  function drawPaddle() {
+    // Draw the paddle
+    ctx.drawImage(
+      $sprites,
+      80,
+      170,
+      paddleWidth,
+      paddleHeight,
+      paddleX,
+      paddleY,
+      paddleWidth,
+      paddleHeight
+    );
+  }
   function drawBricks() {}
 
   function collisionDetection() {}
-  function ballMovement() {}
-  function paddleMovement() {}
+
+  function ballMovement() {
+    // Bounce off the left and right walls
+    if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+      dx = -dx;
+    }
+
+    // Bounce off the top wall
+    if (y + dy < ballRadius) {
+      dy = -dy;
+    }
+
+    /* Paddle collision */
+
+    // If the ball hits the paddle
+    if (
+      y + dy > canvas.height - ballRadius - paddleHeight &&
+      x + dx > paddleX &&
+      x + dx < paddleX + paddleWidth
+    ) {
+      dy = -dy;
+    } else if (y + dy > canvas.height - ballRadius) {
+      // If the ball hits the bottom wall
+      console.log('Game over');
+      document.location.reload();
+    }
+
+    // Move the ball
+    x += dx;
+    y += dy;
+  }
+  function paddleMovement() {
+    if (rightPressed && paddleX < canvas.width - paddleWidth) {
+      paddleX += PADDLE_SPEED;
+    } else if (leftPressed && paddleX > 0) {
+      paddleX -= PADDLE_SPEED;
+    }
+  }
+
+  function cleanCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function initEvents() {
+    document.addEventListener('keydown', keyDownHandler);
+    document.addEventListener('keyup', keyUpHandler);
+
+    function keyDownHandler(e) {
+      const { key } = e;
+      if (key === 'Right' || key === 'ArrowRight') {
+        rightPressed = true;
+      } else if (key === 'Left' || key === 'ArrowLeft') {
+        leftPressed = true;
+      }
+    }
+
+    function keyUpHandler(e) {
+      const { key } = e;
+      if (key === 'Right' || key === 'ArrowRight') {
+        rightPressed = false;
+      } else if (key === 'Left' || key === 'ArrowLeft') {
+        leftPressed = false;
+      }
+    }
+  }
 
   function draw() {
+    console.log(leftPressed, rightPressed);
+    // Clear the canvas
+    cleanCanvas();
     // Draw the elements
     drawBall();
     drawPaddle();
@@ -77,4 +169,5 @@
   }
 
   draw();
+  initEvents();
 </script>
