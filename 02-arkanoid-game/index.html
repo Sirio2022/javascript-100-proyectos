@@ -20,6 +20,25 @@
 />
 <canvas></canvas>
 
+<button
+  id="restart"
+  onclick="document.location.reload()"
+  style="
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+  "
+  hidden
+>
+  Play Again
+</button>
+
 <h2
   style="
     text-align: center;
@@ -41,25 +60,6 @@
 <img hidden id="bricks" src="./bricks.png" alt="Arkanoid Bricks" />
 
 <img hidden id="game-over" src="./game-over.png" alt="Game Over" />
-
-<button
-  id="restart"
-  onclick="document.location.reload()"
-  style="
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 10px 20px;
-    font-size: 20px;
-    background-color: #fff;
-    border: none;
-    cursor: pointer;
-  "
-  hidden
->
-  Play Again
-</button>
 
 <script>
   const canvas = document.querySelector('canvas');
