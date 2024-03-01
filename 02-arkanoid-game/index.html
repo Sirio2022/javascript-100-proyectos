@@ -76,13 +76,13 @@
   let counter = 0;
 
   /* Bricks variables */
-  const brickRowCount = 6;
-  const brickColumnCount = 13;
-  const brickWidth = 50;
-  const brickHeight = 20;
+  const brickRowCount = 8;
+  const brickColumnCount = 20;
+  const brickWidth = 31;
+  const brickHeight = 14;
   const brickPadding = 2;
   const brickOffsetTop = 30;
-  const brickOffsetLeft = 23;
+  const brickOffsetLeft = 30;
   const bricks = [];
 
   const BRICK_STATUS = {
@@ -94,8 +94,8 @@
     bricks[c] = []; // Create a new array for each column
     for (let r = 0; r < brickRowCount; r++) {
       // Calculate the position of each brick
-      const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft; // 0 * (50 + 2) + 23 = 23
-      const brickY = r * (brickHeight + brickPadding) + brickOffsetTop; // 0 * (20 + 2) + 30 = 30
+      const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft; // 0 * (50 + 2) + 23 = 23 px  // 1 * (50 + 2) + 23 = 75 px // 2 * (50 + 2) + 23 = 127 px
+      const brickY = r * (brickHeight + brickPadding) + brickOffsetTop; // 0 * (20 + 2) + 30 = 30 px // 1 * (20 + 2) + 30 = 52 px // 2 * (20 + 2) + 30 = 74 px
 
       // Assign random colors to the bricks
       const random = Math.floor(Math.random() * 8); // Random number between 0 and 7 (8 colors).  This is a trick to get a random color.
@@ -114,17 +114,17 @@
     for (let c = 0; c < brickColumnCount; c++) {
       for (let r = 0; r < brickRowCount; r++) {
         const currentBrick = bricks[c][r];
-        if (currentBrick.status === BRICK_STATUS.DEAD) continue;
+        if (currentBrick.status === BRICK_STATUS.DEAD) continue; // If the brick is dead, continue with the next iteration
 
         // Draw the brick
-        const clipX = currentBrick.color * 32;
+        const clipX = currentBrick.color * 32; // 0 * 32 = 0 // 1 * 32 = 32 // 2 * 32 = 64 // This is a trick to get the x position of the color in the sprite
 
         ctx.drawImage(
           $bricks,
           clipX,
           0,
-          31,
-          14,
+          brickWidth,
+          brickHeight,
           currentBrick.x,
           currentBrick.y,
           brickWidth,
@@ -138,21 +138,17 @@
     for (let c = 0; c < brickColumnCount; c++) {
       for (let r = 0; r < brickRowCount; r++) {
         const currentBrick = bricks[c][r];
-        if (currentBrick.status === BRICK_STATUS.DEAD) continue;
+        if (currentBrick.status === BRICK_STATUS.DEAD) continue; // If the brick is dead, continue with the next iteration
 
-        if (
-          x > currentBrick.x &&
-          x < currentBrick.x + brickWidth &&
-          y > currentBrick.y &&
-          y < currentBrick.y + brickHeight
-        ) {
-          dy = -dy;
-          currentBrick.status = BRICK_STATUS.DEAD;
+        const isBallOnBrickX =
+          x > currentBrick.x && x < currentBrick.x + brickWidth; // Check if the ball is between the x position of the brick
+        const isBallOnBrickY =
+          y > currentBrick.y && y < currentBrick.y + brickHeight; // Check if the ball is between the y position of the brick
+
+        if (isBallOnBrickX && isBallOnBrickY) { // If the ball is on the brick
+          dy = -dy; // Change the direction of the ball
+          currentBrick.status = BRICK_STATUS.DEAD; // Change the status of the brick
           counter++;
-          if (counter === brickRowCount * brickColumnCount) {
-            console.log('You win!');
-            document.location.reload();
-          }
         }
       }
     }
