@@ -75,52 +75,6 @@
   // Our game variables
   let counter = 0;
 
-  /* Ball variables */
-  const ballRadius = 5;
-
-  // Ball position
-  let x = canvas.width / 2; // Center of the canvas
-  let y = canvas.height - 30; // 30px from the bottom
-
-  // Ball velocity
-  let dx = -2.5; // Direction x
-  let dy = -2.5; // Direction y. Negative because we want the ball to go up
-
-  /* Paddle variables */
-  const paddleHeight = 15;
-  const paddleWidth = 60;
-
-  const PADDLE_SPEED = 7;
-
-  let rightPressed = false;
-  let leftPressed = false;
-
-  let paddleX = (canvas.width - paddleWidth) / 2; // Center the paddle
-  let paddleY = canvas.height - paddleHeight - 10; // 10px from the bottom
-
-  function drawBall() {
-    ctx.beginPath(); // Start drawing
-    ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
-    ctx.fill();
-    ctx.closePath(); // End drawing
-  }
-
-  function drawPaddle() {
-    // Draw the paddle
-    ctx.drawImage(
-      $sprites,
-      80, // x position in the sprite
-      170, // y position in the sprite
-      paddleWidth, // width of the paddle
-      paddleHeight, // height of the paddle
-      paddleX, // x position in the canvas
-      paddleY, // y position in the canvas
-      paddleWidth, // width of the paddle
-      paddleHeight // height of the paddle
-    );
-  }
-
   /* Bricks variables */
   const brickRowCount = 6;
   const brickColumnCount = 13;
@@ -180,10 +134,6 @@
     }
   }
 
-  function drawUI() {
-    ctx.fillText(`FPS: ${framesPerSec}`, 25, 20);
-  }
-
   function collisionDetection() {
     for (let c = 0; c < brickColumnCount; c++) {
       for (let r = 0; r < brickRowCount; r++) {
@@ -208,10 +158,23 @@
     }
   }
 
-  function drawScore() {
-    ctx.font = '16px Arial';
+  /* Ball variables */
+  const ballRadius = 5;
+
+  // Ball position
+  let x = canvas.width / 2; // Center of the canvas
+  let y = canvas.height - 30; // 30px from the bottom
+
+  // Ball velocity
+  let dx = -2.5; // Direction x
+  let dy = -2.5; // Direction y. Negative because we want the ball to go up
+
+  function drawBall() {
+    ctx.beginPath(); // Start drawing
+    ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
-    ctx.fillText(`Score: ${counter}`, 625, 20);
+    ctx.fill();
+    ctx.closePath(); // End drawing
   }
 
   function ballMovement() {
@@ -228,11 +191,11 @@
     /* Paddle collision */
 
     // If the ball hits the paddle
-    if (
-      y + dy > canvas.height - ballRadius - paddleHeight &&
-      x + dx > paddleX &&
-      x + dx < paddleX + paddleWidth
-    ) {
+    const isBallOnPaddleX = x > paddleX && x < paddleX + paddleWidth;
+
+    const isBallOnPaddleY = y + dy > paddleY;
+    
+    if (isBallOnPaddleX && isBallOnPaddleY) {
       dy = -dy;
     } else if (y + dy > canvas.height - ballRadius) {
       // If the ball hits the bottom wall
@@ -253,16 +216,40 @@
     x += dx;
     y += dy;
   }
+
+  /* Paddle variables */
+  const paddleHeight = 15;
+  const paddleWidth = 60;
+
+  const PADDLE_SPEED = 8;
+
+  let rightPressed = false;
+  let leftPressed = false;
+
+  let paddleX = (canvas.width - paddleWidth) / 2; // Center the paddle
+  let paddleY = canvas.height - paddleHeight - 10; // 10px from the bottom
+
+  function drawPaddle() {
+    // Draw the paddle
+    ctx.drawImage(
+      $sprites,
+      80, // x position in the sprite
+      170, // y position in the sprite
+      paddleWidth, // width of the paddle
+      paddleHeight, // height of the paddle
+      paddleX, // x position in the canvas
+      paddleY, // y position in the canvas
+      paddleWidth, // width of the paddle
+      paddleHeight // height of the paddle
+    );
+  }
+
   function paddleMovement() {
     if (rightPressed && paddleX < canvas.width - paddleWidth) {
       paddleX += PADDLE_SPEED;
     } else if (leftPressed && paddleX > 0) {
       paddleX -= PADDLE_SPEED;
     }
-  }
-
-  function cleanCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
   function initEvents() {
@@ -288,6 +275,10 @@
     }
   }
 
+  function drawUI() {
+    ctx.fillText(`FPS: ${framesPerSec}`, 25, 20);
+  }
+
   // a que velocidad de fps queremos que renderice nuestro juego
   const fps = 120;
 
@@ -296,6 +287,16 @@
   const msPerFrame = 1000 / fps;
   let frames = 0;
   let framesPerSec = fps;
+
+  function drawScore() {
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`Score: ${counter}`, 625, 20);
+  }
+
+  function cleanCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 
   function draw() {
     window.requestAnimationFrame(draw);
